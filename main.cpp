@@ -5,27 +5,28 @@
 #include <chrono>
 using namespace std;
 
-void DoWork() {
-    for(size_t i = 0; i < 10; i++) {
-        cout << "Id stream = " << this_thread::get_id() << "\tDoWork\t" << i << endl;
+void DoWork(int a, int b) {
+    this_thread::sleep_for(chrono::milliseconds(1000));
+    cout << "-----\t" << "DoWork started\t-----" << endl; 
 
-        this_thread::sleep_for(chrono::milliseconds(1000));
-    }
+    this_thread::sleep_for(chrono::milliseconds(2000));
+
+    cout << "a+b = " << a + b << endl;
+
+    this_thread::sleep_for(chrono::milliseconds(1000));
+
+    cout << "-----\t" << "DoWork stoped\t-----" << endl; 
 };
 
 int main() {
-    thread th(DoWork);
+    thread th(DoWork, 2, 3);
 
-    //th.detach(); Breaks the connection between threads
-
-    for(size_t i = 0; i < 10; i++) {
+    for(size_t i = 0; true; i++) {
         cout << "Id stream = " << this_thread::get_id() << "\tMain\t" << i << endl;
 
         this_thread::sleep_for(chrono::milliseconds(500));
     }
 
-
-    //Wait the stream. (The base stream will be wait th)
     th.join();
 
     return 0;
