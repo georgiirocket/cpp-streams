@@ -5,29 +5,31 @@
 #include <chrono>
 using namespace std;
 
-void DoWork(int a, int b) {
+void DoWork(int& a) {
     this_thread::sleep_for(chrono::milliseconds(1000));
-    cout << "-----\t" << "DoWork started\t-----" << endl; 
+    cout << "Id stream: " << this_thread::get_id() << " -----\t" << "DoWork started\t-----" << endl; 
 
     this_thread::sleep_for(chrono::milliseconds(2000));
 
-    cout << "a+b = " << a + b << endl;
+    a *= 2;
 
-    this_thread::sleep_for(chrono::milliseconds(1000));
-
-    cout << "-----\t" << "DoWork stoped\t-----" << endl; 
+    cout << "Id stream: " << this_thread::get_id() << " -----\t" << "DoWork stoped\t-----" << endl; 
 };
 
 int main() {
-    thread th(DoWork, 2, 3);
+    int a = 10;
 
-    for(size_t i = 0; true; i++) {
+    thread t(DoWork, std::ref(a));
+
+    for(size_t i = 0; i < 10; i++) {
         cout << "Id stream = " << this_thread::get_id() << "\tMain\t" << i << endl;
 
         this_thread::sleep_for(chrono::milliseconds(500));
     }
 
-    th.join();
+    
+    t.join();
+    cout << a << endl;
 
     return 0;
 }
