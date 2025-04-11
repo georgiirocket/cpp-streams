@@ -4,35 +4,39 @@
 #include <chrono>
 using namespace std;
 
-recursive_mutex rm;
+mutex mtx;
 
-void Foo(int a) 
+void print(char ch)
 {
-    rm.lock();
-    cout << a << " ";
+    unique_lock<mutex> ul(mtx, std::defer_lock);
 
-    this_thread::sleep_for(chrono::milliseconds(300));
+    this_thread::sleep_for(chrono::milliseconds(2000));
 
-    if(a <= 1)
+    ul.lock();
+    for(int i = 0; i < 5; i++) 
     {
-        cout << endl;
-        rm.unlock();
+        for (size_t j = 0; j < 10; j++)
+        {
+            cout << ch;
 
-        return;
+            this_thread::sleep_for(chrono::milliseconds(10));
+        }
+        cout << endl;
     }
 
-    a--;
+    cout << endl;
 
-    Foo(a);
-    rm.unlock();
+    ul.unlock();
+
+    this_thread::sleep_for(chrono::milliseconds(2000));
 }
 
 int main() {
-    thread t1(Foo, 10);
-    thread t2(Foo, 10);
+    thread t(print, '*');
+    thread t1(print, '#');
 
+    t.join();
     t1.join();
-    t2.join();
 
     return 0;
 }
