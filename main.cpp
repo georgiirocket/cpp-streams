@@ -4,36 +4,65 @@
 #include <chrono>
 using namespace std;
 
-mutex mtx;
+mutex mtx1;
+mutex mtx2;
 
-void print(char ch) 
+void print() 
 {
-    this_thread::sleep_for(chrono::milliseconds(2000));
 
-    //Scope lock_guard
+    mtx2.lock();
+
+    this_thread::sleep_for(chrono::milliseconds(1));
+
+    mtx1.lock();
+
+    for(int i = 0; i < 5; i++) 
     {
-        lock_guard<mutex> guard(mtx); // = mutex.lock()
-
-        for(int i = 0; i < 5; i++) 
+        for(int j = 0; j < 10; j++) 
         {
-            for(int j = 0; j < 10; j++) 
-            {
-                cout << ch;
-
-                this_thread::sleep_for(chrono::milliseconds(20));
-            }
-
-            cout << endl;
+            cout << '*';
+            this_thread::sleep_for(chrono::milliseconds(10));
         }
+
+        cout << endl;
     }
 
-    this_thread::sleep_for(chrono::milliseconds(2000));
+    cout << endl;
+
+    mtx1.unlock();
+    mtx2.unlock();
+}
+
+void print2() 
+{
+
+    mtx1.lock();
+
+    this_thread::sleep_for(chrono::milliseconds(1));
+
+    mtx2.lock();
+
+    for(int i = 0; i < 5; i++) 
+    {
+        for(int j = 0; j < 10; j++) 
+        {
+            cout << '#';
+            this_thread::sleep_for(chrono::milliseconds(10));
+        }
+
+        cout << endl;
+    }
+
+    cout << endl;
+
+    mtx1.unlock();
+    mtx2.unlock();
 }
 
 
 int main() {
-    thread t1(print, '-');
-    thread t2(print, '*');
+    thread t1(print);
+    thread t2(print2);
 
     t1.join();
     t2.join();
