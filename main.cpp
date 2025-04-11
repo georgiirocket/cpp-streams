@@ -6,25 +6,15 @@ using namespace std;
 
 mutex mtx;
 
-void print(char ch)
+void AddName(string name, vector<string>& storage)
 {
     unique_lock<mutex> ul(mtx, std::defer_lock);
 
     this_thread::sleep_for(chrono::milliseconds(2000));
 
     ul.lock();
-    for(int i = 0; i < 5; i++) 
-    {
-        for (size_t j = 0; j < 10; j++)
-        {
-            cout << ch;
 
-            this_thread::sleep_for(chrono::milliseconds(10));
-        }
-        cout << endl;
-    }
-
-    cout << endl;
+    storage.push_back(name);
 
     ul.unlock();
 
@@ -32,11 +22,21 @@ void print(char ch)
 }
 
 int main() {
-    thread t(print, '*');
-    thread t1(print, '#');
+    vector<string> names;
+
+    thread t(AddName, "Piter", std::ref(names));
+    thread t1(AddName, "Patrik", std::ref(names));
+    thread t2(AddName, "Stuart", std::ref(names));
 
     t.join();
     t1.join();
+    t2.join();
+
+    for(string name : names)
+    {
+        cout << "Name: " << name << endl;
+    }
+
 
     return 0;
 }
